@@ -19,6 +19,15 @@ let barrierPoints = [
 // of points the defines its vertices.
 let barrier = PolygonShape(points: barrierPoints)
 
+//Add a funnel, a new shape to represent through which ball drops
+let funnelPoints = [
+    Point(x:0, y: 50),
+    Point(x:80, y:50),
+    Point(x:60, y: 0),
+    Point(x: 20, y: 0)
+]
+let funnel = PolygonShape(points: funnelPoints)
+
 /*
 The setup() function is called once when the app launches. Without it, your app won't compile.
 Use it to set up and start your app.
@@ -43,11 +52,29 @@ func setup() {
     // as the ball accelerates downwards as physics would dictate
     circle.hasPhysics = true
     
-    //Add a barrier to the scene.
+    
+    // Add a barrier to the scene.
     barrier.position = Point(x: 200, y: 150)
     barrier.hasPhysics = true
     scene.add(barrier)
     
-    // use property isImmobile so the barrie shape doesnt move
+    // use property isImmobile so the barrier shape doesnt move
     barrier.isImmobile = true
+    
+    
+    // Add a funnel to the scene
+    // use property height to position the funnel at the top of the screen
+    funnel.position = Point(x: 200, y: scene.height - 25)
+    scene.add(funnel)
+    
+    // the onTapped property of a shape has a type of a function.
+    // Any function can be called as long as there are no parameters
+    // or returns
+    funnel.onTapped = dropBall
+}
+
+
+// Drops the ball by moving it to the funnels position
+func dropBall() {
+    circle.position = funnel.position
 }
