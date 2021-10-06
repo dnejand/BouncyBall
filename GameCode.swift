@@ -1,23 +1,29 @@
 import Foundation
 
+// declare a new variable to store the array of multiple barriers
+var barriers: [Shape] = []
+
+// create multiple targets - array of targets variable declartion
+var targets: [Shape] = []
+
 // Create an new instance of OvalShape type named circle with width and height of 150
 let ball = OvalShape(width:40, height: 40)
 
 // define the width and height of the barrier
-let barrierWidth = 300.0
-let barrierHeight = 25.0
-
+//let barrierWidth = 300.0
+//let barrierHeight = 25.0
+//
 // create an array of Point instances to describe the barriers four corners
-let barrierPoints = [
-    Point(x: 0, y: 0),
-    Point(x: 0, y: barrierHeight),
-    Point(x: barrierWidth, y: barrierHeight),
-    Point(x: barrierWidth, y: 0)
-]
+//let barrierPoints = [
+//    Point(x: 0, y: 0),
+//    Point(x: 0, y: barrierHeight),
+//    Point(x: barrierWidth, y: barrierHeight),
+//    Point(x: barrierWidth, y: 0)
+//]
 
 // create a new PolygonShape instance whose initializer requires an array
 // of points the defines its vertices.
-let barrier = PolygonShape(points: barrierPoints)
+//let barrier = PolygonShape(points: barrierPoints)
 
 // Add a funnel, a new shape to represent through which ball drops
 let funnelPoints = [
@@ -29,13 +35,13 @@ let funnelPoints = [
 let funnel = PolygonShape(points: funnelPoints)
 
 // Add a target shape
-let targetPoints = [
-    Point(x: 10, y: 0),
-    Point(x: 0, y: 10),
-    Point(x: 10, y: 20),
-    Point(x: 20, y: 10)
-]
-let target = PolygonShape(points: targetPoints)
+//let targetPoints = [
+//    Point(x: 10, y: 0),
+//    Point(x: 0, y: 10),
+//    Point(x: 10, y: 20),
+//    Point(x: 20, y: 10)
+//]
+//let target = PolygonShape(points: targetPoints)
 
 
 /*
@@ -77,13 +83,27 @@ fileprivate func setupBall() {
     ball.onTapped = resetGame
 }
 
-fileprivate func setupBarrier() {
+fileprivate func addBarrier(at position: Point, width: Double, height: Double, angle: Double) {
+    
+    let barrierPoints = [
+        Point(x: 0, y: 0),
+        Point(x: 0, y: height),
+        Point(x: width, y: height),
+        Point(x: width, y: 0)
+    ]
+    
+    // create shape and size or parameters for the barrier
+    let barrier = PolygonShape(points: barrierPoints)
+    
+    barriers.append(barrier)
+    
     // Add a barrier to the scene.
-    //barrier.position = Point(x: 200, y: 150)
-    barrier.position = Point(x: 370, y: 422)
+    //barrier.position = Point(x: 370, y: 422)
+    barrier.position = position
     barrier.hasPhysics = true
     // tilt the barrier
-    barrier.angle = 0.1
+    //barrier.angle = 0.1
+    barrier.angle = angle
     scene.add(barrier)
     
     // change barrier fillColor property to color red
@@ -106,15 +126,26 @@ fileprivate func setupFunnel() {
     funnel.fillColor = .gray
 }
 
-func setupTarget() {
-    target.position = Point(x: 200, y: 400)
+func addTarget(at position: Point) {
+    let targetPoints = [
+        Point(x: 10, y: 0),
+        Point(x: 0, y: 10),
+        Point(x: 10, y: 20),
+        Point(x: 20, y: 10)
+    ]
+    
+    let target = PolygonShape(points: targetPoints)
+    
+    // target.position = Point(x: 200, y: 400)
+    target.position = position
+    
     target.hasPhysics = true
     target.isImmobile = true
     target.isImpermeable = false
     target.fillColor = .yellow
     target.name = "target"
     
-//    target.isDraggable = false
+    target.isDraggable = false
     
     scene.add(target)
 }
@@ -129,7 +160,9 @@ func ballCollided (with otherShape: Shape){
 // Call function for when ball exits the scene
 func ballExitedScene(){
     // allow user to move barrier since ball is not in play
-    barrier.isDraggable = true
+    for barrier in barriers {
+        barrier.isDraggable = true
+    }
 }
 
 // Resest the game by moving the ball below the scene,
@@ -146,13 +179,19 @@ func printPosition (of shape: Shape) {
 func setup() {
     
     setupBall()
-    
-    setupBarrier()
-        
     setupFunnel()
     
+    //add barriers to the scene
+    addBarrier(at: Point(x: 200, y: 150), width: 80, height:25, angle: 0.1)
+    addBarrier(at: Point(x: 100, y: 150), width: 30, height:15, angle: -0.2)
+    addBarrier(at: Point(x: 300, y: 150), width: 100, height:25, angle: 0.03)
+    
     // add a target to the scene
-    setupTarget()
+    addTarget(at: Point(x:133, y: 614))
+    addTarget(at: Point(x:111, y: 474))
+    addTarget(at: Point(x:256, y: 280))
+    addTarget(at: Point(x:151, y: 242))
+    addTarget(at: Point(x:165, y: 40))
     
     // print the position every time a shape is moved
     scene.onShapeMoved = printPosition(of:)
@@ -174,7 +213,9 @@ func setup() {
 func dropBall() {
     
     // dont allow player to move barrier while ball is in play
-    barrier.isDraggable = false
+    for barrier in barriers {
+        barrier.isDraggable = false
+    }
     
     ball.position = funnel.position
     
