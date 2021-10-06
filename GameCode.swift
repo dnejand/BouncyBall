@@ -65,7 +65,13 @@ fileprivate func setupBall() {
     // change ball color to blue
     ball.fillColor = .blue
     
+    // dont allow user to move or drage the ball
+    ball.isDraggable = false
+    
     ball.onCollision = ballCollided(with:)
+
+    // move ball below scene after ball drops to allow user to move barriers
+    ball.onTapped = resetGame
 }
 
 fileprivate func setupBarrier() {
@@ -112,6 +118,18 @@ func ballCollided (with otherShape: Shape){
     otherShape.fillColor = .green
 }
 
+// Call function for when ball exits the scene
+func ballExitedScene(){
+    // allow user to move barrier since ball is not in play
+    barrier.isDraggable = true
+}
+
+// Resest the game by moving the ball below the scene,
+// which will unlock the barriers.
+func resetGame() {
+    ball.position = Point (x:  0, y: -80)
+}
+
 func setup() {
     
     setupBall()
@@ -122,11 +140,28 @@ func setup() {
     
     // add a target to the scene
     setupTarget()
+    
+    // keep track of ball and call function ballExitedScene
+    // to allow user to to move barrier since ball exited scene
+    // or not in play
+    scene.trackShape(ball)
+    ball.onExitedScene = ballExitedScene
+    
+    // Resest the game by moving the ball below the scene,
+    // which will unlock the barriers.
+    resetGame()
 
 }
 
 
 // Drops the ball by moving it to the funnels position
 func dropBall() {
+    
+    // dont allow player to move barrier while ball is in play
+    barrier.isDraggable = false
+    
     ball.position = funnel.position
+    
+    // every time you tap the funnel the ball exits with greater speed
+    ball.stopAllMotion()
 }
