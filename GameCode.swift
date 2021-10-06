@@ -75,9 +75,15 @@ fileprivate func setupBall() {
     ball.isDraggable = false
     
     // make a bouncier ball
-    ball.bounciness = 0.5
+    ball.bounciness = 0.6
     
     ball.onCollision = ballCollided(with:)
+    
+    // keep track of ball and call function ballExitedScene
+    // to allow user to to move barrier since ball exited scene
+    // or not in play
+    scene.trackShape(ball)
+    ball.onExitedScene = ballExitedScene
 
     // move ball below scene after ball drops to allow user to move barriers
     ball.onTapped = resetGame
@@ -124,6 +130,10 @@ fileprivate func setupFunnel() {
     // or returns
     funnel.onTapped = dropBall
     funnel.fillColor = .gray
+    
+    // missing in instructions of the book
+    // add so user cant move the funnel
+    funnel.isDraggable = false
 }
 
 func addTarget(at position: Point) {
@@ -135,6 +145,8 @@ func addTarget(at position: Point) {
     ]
     
     let target = PolygonShape(points: targetPoints)
+    
+    targets.append(target)
     
     // target.position = Point(x: 200, y: 400)
     target.position = position
@@ -159,6 +171,25 @@ func ballCollided (with otherShape: Shape){
 
 // Call function for when ball exits the scene
 func ballExitedScene(){
+    
+    // track how many targets the user hits after dropping ball
+    var hitTargets = 0
+    for target in targets {
+        if target.fillColor == .green {
+            hitTargets += 1
+        }
+    }
+    // number of targets hit equals the array size of all targets
+    // then all targets were hit in one try
+    print ("hitTargets = \(hitTargets)")
+    print ("targets.count = \(targets.count)")
+    if hitTargets == targets.count {
+        // print ("Won game!")
+        scene.presentAlert(text: "You won!",completion: alertDismissed)
+    }
+    func alertDismissed () {
+    }
+    
     // allow user to move barrier since ball is not in play
     for barrier in barriers {
         barrier.isDraggable = true
@@ -196,12 +227,6 @@ func setup() {
     // print the position every time a shape is moved
     scene.onShapeMoved = printPosition(of:)
     
-    // keep track of ball and call function ballExitedScene
-    // to allow user to to move barrier since ball exited scene
-    // or not in play
-    scene.trackShape(ball)
-    ball.onExitedScene = ballExitedScene
-    
     // Resest the game by moving the ball below the scene,
     // which will unlock the barriers.
     resetGame()
@@ -211,6 +236,12 @@ func setup() {
 
 // Drops the ball by moving it to the funnels position
 func dropBall() {
+    
+    // every time the ball drops, rest all targets so user
+    // has to hit them all on one try to win game
+    for target in targets {
+        target.fillColor = .yellow
+    }
     
     // dont allow player to move barrier while ball is in play
     for barrier in barriers {
