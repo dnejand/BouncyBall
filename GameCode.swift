@@ -68,6 +68,9 @@ fileprivate func setupBall() {
     // dont allow user to move or drage the ball
     ball.isDraggable = false
     
+    // make a bouncier ball
+    ball.bounciness = 0.5
+    
     ball.onCollision = ballCollided(with:)
 
     // move ball below scene after ball drops to allow user to move barriers
@@ -76,8 +79,11 @@ fileprivate func setupBall() {
 
 fileprivate func setupBarrier() {
     // Add a barrier to the scene.
-    barrier.position = Point(x: 200, y: 150)
+    //barrier.position = Point(x: 200, y: 150)
+    barrier.position = Point(x: 370, y: 422)
     barrier.hasPhysics = true
+    // tilt the barrier
+    barrier.angle = 0.1
     scene.add(barrier)
     
     // change barrier fillColor property to color red
@@ -108,6 +114,8 @@ func setupTarget() {
     target.fillColor = .yellow
     target.name = "target"
     
+//    target.isDraggable = false
+    
     scene.add(target)
 }
 
@@ -130,6 +138,11 @@ func resetGame() {
     ball.position = Point (x:  0, y: -80)
 }
 
+//
+func printPosition (of shape: Shape) {
+    print(shape.position)
+}
+
 func setup() {
     
     setupBall()
@@ -141,6 +154,9 @@ func setup() {
     // add a target to the scene
     setupTarget()
     
+    // print the position every time a shape is moved
+    scene.onShapeMoved = printPosition(of:)
+    
     // keep track of ball and call function ballExitedScene
     // to allow user to to move barrier since ball exited scene
     // or not in play
@@ -150,7 +166,7 @@ func setup() {
     // Resest the game by moving the ball below the scene,
     // which will unlock the barriers.
     resetGame()
-
+        
 }
 
 
